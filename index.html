@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebTools</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fafafa;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Hide scrollbar for clean look */
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+
+        .tool-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            /* Soft shadow for depth */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            /* Start invisible for animation */
+            opacity: 0;
+        }
+        
+        .tool-card.active:hover {
+            transform: translateY(-4px);
+            /* Stronger shadow on hover */
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .tool-card.active:active {
+            transform: scale(0.98);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+
+        /* Minimalist Title */
+        .title-minimal {
+            font-weight: 700; /* Bold */
+            color: #a1a1aa; /* zinc-400 for a lighter, softer gray */
+            letter-spacing: 0.35em; /* Significantly increased gap */
+        }
+
+        /* Tape Effect for Coming Soon */
+        .tape {
+            background-color: #fef3c7; /* amber-100 */
+            color: #92400e; /* amber-800 */
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            transform: translate(-50%, -50%) rotate(-10deg);
+            z-index: 20;
+            /* Jagged edges via clip-path can be cool but simple is better for aesthetic */
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        /* Tape visual edges */
+        .tape::before, .tape::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: rgba(255,255,255,0.4);
+            border-left: 1px dashed rgba(0,0,0,0.1);
+        }
+        .tape::before { left: 2px; }
+        .tape::after { right: 2px; }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+        
+        .animate-card-entry {
+            animation: fadeInUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+    </style>
+</head>
+<body class="text-zinc-900 min-h-screen flex flex-col">
+
+    <div id="app" class="flex-1 flex flex-col max-w-4xl mx-auto w-full p-6">
+    </div>
+
+    <footer class="py-12 text-center text-sm text-zinc-400">
+        <p class="leading-relaxed">
+            Made with ❤️...... But mostly 🧠<br>
+            <a href="https://www.PrithviSharma.com" target="_blank" class="text-zinc-500 hover:text-zinc-800 transition-colors hover:underline underline-offset-4">www.PrithviSharma.com</a>
+        </p>
+    </footer>
+
+    <script>
+        const tools = [
+            {
+                id: 'coin',
+                name: 'Coin Toss',
+                description: 'Heads or Tails?',
+                url: 'coin_toss.html', 
+                icon: '<img src="assets/coin_toss_logo.png" alt="Coin Toss Logo" class="w-12 h-12">',
+                status: 'active'
+            },
+            {
+                id: 'coming-soon',
+                name: 'coming-soon',
+                description: '',
+                url: '',
+                icon: '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>',
+                status: 'coming-soon'
+            },
+        ];
+
+        const app = document.getElementById('app');
+
+        function render() {
+            app.innerHTML = '';
+            
+            const header = document.createElement('header');
+            header.className = 'flex flex-col items-center justify-center mb-16 mt-12';
+            header.innerHTML = `
+                <h1 class="text-4xl sm:text-5xl title-minimal select-none">WebTools</h1>
+            `;
+            app.appendChild(header);
+
+            renderDashboard();
+        }
+
+        function renderDashboard() {
+            const grid = document.createElement('div');
+            grid.className = 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6';
+
+            tools.forEach((tool, index) => {
+                const isComingSoon = tool.status === 'coming-soon';
+                const card = document.createElement(isComingSoon ? 'div' : 'a');
+                
+                let cardClasses = `
+                    tool-card relative bg-white border border-zinc-200 rounded-2xl overflow-hidden animate-card-entry
+                `;
+                
+                if (isComingSoon) {
+                    cardClasses += ' cursor-default';
+                } else {
+                    cardClasses += ' active cursor-pointer hover:border-zinc-300 hover:bg-zinc-50/50 decoration-0 no-underline shadow-lg hover:shadow-2xl';
+                    card.href = tool.url;
+                    if (tool.url.startsWith('http')) {
+                        card.target = "_blank";
+                        card.rel = "noopener noreferrer";
+                    }
+                }
+                card.className = cardClasses;
+                
+                card.style.animationDelay = `${index * 120}ms`;
+
+                const iconHtml = `
+                    <div class="mb-4 w-12 h-12 flex items-center justify-center rounded-xl bg-zinc-50 text-zinc-600 overflow-hidden relative group-hover:bg-white group-hover:shadow-sm transition-all">
+                        <img 
+                            src="images/${tool.id}.png" 
+                            alt="${tool.name}" 
+                            class="w-full h-full object-cover" 
+                            onerror="this.parentElement.innerHTML = '${tool.icon.replace(/"/g, "&quot;")}'"
+                        />
+                    </div>
+                `;
+
+                const contentClasses = `
+                    flex flex-col items-center p-6 w-full h-full
+                    ${isComingSoon ? 'filter blur-[1px] opacity-40 select-none' : ''}
+                `;
+
+                const contentHtml = `
+                    <div class="${contentClasses}">
+                        ${iconHtml}
+                        <h3 class="text-sm font-medium text-zinc-800 mb-1 group-hover:text-black transition-colors">${tool.name}</h3>
+                        <p class="text-[11px] text-zinc-400 text-center leading-tight font-light">${tool.description}</p>
+                    </div>
+                `;
+                const tapeHtml = isComingSoon ? `
+                    <div class="tape absolute top-1/2 left-1/2 px-4 py-1 font-mono text-xs font-bold uppercase tracking-wider">
+                        Coming Soon
+                    </div>
+                ` : '';
+
+                card.innerHTML = contentHtml + tapeHtml;
+                grid.appendChild(card);
+            });
+            app.appendChild(grid);
+        }
+
+        render();
+
+    </script>
+</body>
+</html>
