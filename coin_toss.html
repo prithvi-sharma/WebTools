@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Coin Toss</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #fbfbfb; -webkit-tap-highlight-color: transparent; margin: 0; }
+  </style>
+  <script type="importmap">
+  {
+    "imports": {
+      "rxjs": "https://esm.sh/rxjs@^7.8.2?conditions=es2015",
+      "rxjs/operators": "https://esm.sh/rxjs@^7.8.2/operators?conditions=es2015",
+      "rxjs/ajax": "https://esm.sh/rxjs@^7.8.2/ajax?conditions=es2015",
+      "rxjs/webSocket": "https://esm.sh/rxjs@^7.8.2/webSocket?conditions=es2015",
+      "rxjs/testing": "https://esm.sh/rxjs@^7.8.2/testing?conditions=es2015",
+      "rxjs/fetch": "https://esm.sh/rxjs@^7.8.2/fetch?conditions=es2015",
+      "@angular/compiler": "https://esm.sh/@angular/compiler@^21.0.6?external=rxjs",
+      "@angular/platform-browser": "https://esm.sh/@angular/platform-browser@^21.0.6?external=rxjs",
+      "@angular/core": "https://esm.sh/@angular/core@^21.0.6?external=rxjs",
+      "@angular/common": "https://esm.sh/@angular/common@^21.0.6?external=rxjs"
+    }
+  }
+  </script>
+</head>
+<body>
+  <app-root></app-root>
+
+  <script type="module">
+    import '@angular/compiler';
+    import { bootstrapApplication } from '@angular/platform-browser';
+    import { Component, signal, provideZonelessChangeDetection, ChangeDetectionStrategy } from '@angular/core';
+    import { CommonModule } from '@angular/common';
+
+    class AppComponent {
+      constructor() {
+        this.isFlipping = signal(false);
+        this.result = signal(null);
+        this.rotation = signal(0);
+      }
+
+      flip() {
+        if (this.isFlipping()) return;
+        this.isFlipping.set(true);
+        
+        const flipResult = Math.random() > 0.5 ? 'heads' : 'tails';
+        const spins = 12 + Math.floor(Math.random() * 4);
+        const targetBase = spins * 360;
+        const sideAdjustment = flipResult === 'heads' ? 0 : 180;
+        
+        const currentRot = this.rotation();
+        const normalizeCurrent = currentRot % 360;
+        const newRotation = currentRot + (360 - normalizeCurrent) + targetBase + sideAdjustment;
+        
+        this.rotation.set(newRotation);
+
+        setTimeout(() => {
+          this.result.set(flipResult);
+          this.isFlipping.set(false);
+        }, 2500);
+      }
+    }
+
+    const DecoratedAppComponent = Component({
+      selector: 'app-root',
+      standalone: true,
+      imports: [CommonModule],
+      changeDetection: ChangeDetectionStrategy.OnPush,
+      template: `
+        <div class="fixed inset-0 flex flex-col items-center justify-between pt-12 pb-4 px-6 select-none overflow-hidden bg-[#FBFBFB]" (click)="flip()">
+          
+          <div class="mt-4 text-center">
+            <h1 class="text-3xl tracking-[0.2em] text-gray-400" style="font-weight: 900;">Coin Toss</h1>
+          </div>
+
+          <div class="relative w-full flex flex-col items-center justify-center flex-[2] -translate-y-20">
+            
+            <div 
+              class="absolute w-64 h-10 rounded-full bg-black/15 blur-2xl transition-all duration-[2500ms] cubic-bezier translate-y-36"
+              [style.transform]="isFlipping() ? 'scale(0.8)' : 'scale(1)'"
+              [style.opacity]="isFlipping() ? '0.4' : '0.7'"
+            ></div>
+
+            <div class="perspective" [class.jump-animation]="isFlipping()">
+              <div 
+                class="w-80 h-80 relative preserve-3d transition-transform duration-[2500ms] cubic-bezier"
+                [style.transform]="'rotateY(' + rotation() + 'deg)'"
+              >
+                <div 
+                  class="absolute inset-0 w-full h-full rounded-full border border-gray-200/50 flex items-center justify-center backface-hidden shadow-sm"
+                  style="background: linear-gradient(135deg, #fff8e0, #ededed);"
+                >
+                  <span class="text-gray-500/40 font-semibold text-3xl tracking-[0.2em] mt-2">Heads</span>
+                </div>
+                
+                <div 
+                  class="absolute inset-0 w-full h-full rounded-full border border-gray-200/50 flex items-center justify-center backface-hidden rotate-y-180 shadow-sm"
+                  style="background: linear-gradient(135deg, #fff8e0, #ededed);"
+                >
+                  <span class="text-gray-500/40 font-semibold text-3xl tracking-[0.2em] mt-2">Tails</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="absolute top-[77%] ml-[18px] w-full text-center pointer-events-none">
+              @if (result() && !isFlipping()) {
+                <h2 class="text-6xl font-bold text-gray-700/40 uppercase tracking-[0.25em] animate-fade-in">
+                  {{ result() }}
+                </h2>
+              }
+            </div>
+          </div>
+
+          <footer class="w-full text-center py-8 flex flex-col gap-1">
+			<p class="text-sm text-zinc-400 font-normal leading-tight">Made with ❤️...... But mostly 🧠</p>
+			<a href="https://www.PrithviSharma.com" target="_blank" class="text-sm text-zinc-500 font-normal hover:text-zinc-900 hover:underline transition-all" (click)="$event.stopPropagation()">
+				www.PrithviSharma.com
+			</a>
+		  </footer>
+        </div>
+      `,
+      styles: [`
+        .cubic-bezier { transition-timing-function: cubic-bezier(0.15, 0, 0.15, 1); }
+        @keyframes fade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fade 0.8s ease-out forwards; }
+        
+        .perspective { perspective: 1200px; }
+        .preserve-3d { transform-style: preserve-3d; }
+        .backface-hidden { backface-visibility: hidden; }
+        .rotate-y-180 { transform: rotateY(180deg); }
+        
+        @keyframes coin-jump {
+          0% { transform: translateY(0) scale(1); }
+          35% { transform: translateY(-30px) scale(1.02); }
+          70% { transform: translateY(0) scale(1); }
+          100% { transform: translateY(0) scale(1); }
+        }
+        .jump-animation { animation: coin-jump 2600ms cubic-bezier(0.15, 0, 0.15, 1) forwards; }
+      `]
+    })(AppComponent);
+
+    bootstrapApplication(DecoratedAppComponent, {
+      providers: [provideZonelessChangeDetection()]
+    });
+  </script>
+</body>
+</html>
