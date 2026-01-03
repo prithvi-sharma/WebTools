@@ -16,17 +16,14 @@
     .animate-fade-in{animation:fade .5s ease-out forwards}
     @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 
-    /* coin jump: translate on the coin wrapper only (no layout shift) */
     @keyframes coin-jump {0%{transform:translateY(0)}35%{transform:translateY(-34px)}70%{transform:translateY(0)}100%{transform:translateY(0)}}
     .jump{animation:coin-jump 900ms cubic-bezier(0.15,0,0.15,1) forwards}
 
-    /* shadow pulse */
     @keyframes shadow-pulse {0%{transform:scale(1);opacity:.7}35%{transform:scale(.8);opacity:.4}70%{transform:scale(1);opacity:.7}100%{transform:scale(1);opacity:.7}}
     .shadow-anim{animation:shadow-pulse 900ms cubic-bezier(0.15,0,0.15,1) forwards}
 
-    /* small adjustments */
-    .title-gap { margin-bottom: 4px; }            /* reduced gap under title (was 6px) */
-    .result-offset { transform: translate(-50%, 22px); }
+    .title-gap { margin-bottom: 4px; }
+    .result-offset { transform: translate(-50%, 24px); }
   </style>
 </head>
 <body>
@@ -37,10 +34,8 @@
 
     <main id="main" class="w-full flex items-center justify-center mt-2">
       <div class="flex flex-col items-center">
-        <!-- shadow in normal flow under coin -->
         <div id="shadow" class="w-[85vw] h-10 rounded-full bg-black/15 blur-2xl" style="opacity:.7; transition:opacity .2s, transform .2s;"></div>
 
-        <!-- coin wrapper; jump applied here so coin visually moves up while result sits below -->
         <div id="coinWrap" class="relative mt-10 w-[75vw] h-[75vw] aspect-square" aria-label="Coin Wrapper" role="button">
           <div id="coin" class="perspective w-full h-full preserve-3d cubic-bezier" style="transition:transform 2.5s cubic-bezier(.15,0,.15,1);">
             <div class="absolute inset-0 w-full h-full rounded-full border border-gray-200/50 flex items-center justify-center backface-hidden shadow-sm"
@@ -53,10 +48,11 @@
             </div>
           </div>
 
-			<div id="result"
-				 class="absolute left-1/2 top-full pointer-events-none text-center"
-				 style="width:100%; transform: translate(-50%, 24px);"
-				 aria-hidden="true"></div>
+		<div id="result"
+			 class="absolute left-1/2 top-full pointer-events-none text-center"
+			 style="transform: translateX(-50%);"
+			 aria-hidden="true"></div>
+
         </div>
       </div>
     </main>
@@ -78,12 +74,11 @@
     document.getElementById('main').addEventListener('click', () => {
       if (isFlipping) return;
       isFlipping = true;
-      resultEl.innerHTML = ''; // clear previous
+      resultEl.innerHTML = '';
 
-      // restart animations
       coinWrap.classList.remove('jump');
       shadow.classList.remove('shadow-anim');
-      void coinWrap.offsetWidth; // force reflow to restart animation
+      void coinWrap.offsetWidth;
       coinWrap.classList.add('jump');
       shadow.classList.add('shadow-anim');
 
