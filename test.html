@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Counter</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #ffffff;
+      color: #171717;
+      margin: 0;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      overflow: hidden;
+      touch-action: manipulation;
+    }
+
+    .counter-text {
+      font-size: clamp(8rem, 40vw, 18rem);
+      font-weight: 800;
+      letter-spacing: -0.06em;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.5s ease;
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .counter-text:active {
+      transform: scale(0.95) !important;
+    }
+
+    .target-reached {
+      color: #059669;
+      animation: victory-pulse 2s infinite;
+    }
+
+    @keyframes victory-pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.03); }
+      100% { transform: scale(1); }
+    }
+
+    .btn-row {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      background: #f8f8f8;
+      padding: 0.6rem;
+      border-radius: 100px;
+      margin-top: 1.5rem;
+    }
+
+    .btn-action {
+      height: 4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 100px;
+      transition: all 0.2s ease;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-small {
+      width: 4rem;
+      background: #ffffff;
+      color: #737373;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+
+    .btn-small:hover {
+      color: #171717;
+      transform: translateY(-2px);
+    }
+
+    .btn-reset {
+      padding: 0 2rem;
+      background: transparent;
+      color: #a3a3a3;
+      font-size: 0.7rem;
+    }
+
+    .btn-reset:hover {
+      color: #ef4444;
+    }
+
+    .btn-action:active {
+      transform: scale(0.92);
+    }
+
+    .target-popup {
+      position: absolute;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%) scale(0.9);
+      background: white;
+      padding: 1.5rem;
+      border-radius: 24px;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15);
+      border: 1px solid #f0f0f0;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      width: 220px;
+      z-index: 50;
+    }
+
+    .target-popup.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(-50%) scale(1);
+    }
+
+    .target-input {
+      background: #f9f9f9;
+      border: 1px solid #eeeeee;
+      text-align: center;
+      font-size: 1.25rem;
+      font-weight: 700;
+      width: 100%;
+      padding: 0.75rem;
+      border-radius: 12px;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .target-input:focus {
+      border-color: #171717;
+      background: white;
+      box-shadow: 0 0 0 4px rgba(0,0,0,0.05);
+    }
+
+    .target-input.error {
+      border-color: #ef4444;
+      color: #ef4444;
+      background: #fef2f2;
+    }
+
+    .label-tiny {
+      font-size: 0.6rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.3em;
+      color: #a3a3a3;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    footer {
+      padding-bottom: 2.5rem;
+      text-align: center;
+    }
+
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    * {
+      -webkit-tap-highlight-color: transparent;
+    }
+  </style>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body>
+
+  <header class="pt-10">
+    <h1 class="text-xs font-black tracking-[0.6em] uppercase text-neutral-300">Counter</h1>
+  </header>
+
+  <main class="flex flex-col items-center justify-center flex-1 w-full relative">
+    <div id="counter-display" class="counter-text" onclick="increment()">0</div>
+    
+    <div id="target-info" class="mt-[-1rem] flex flex-col items-center opacity-0 transition-opacity duration-300">
+      <span class="label-tiny">Target: <span id="target-value-display">0</span></span>
+      <div id="goal-tag" class="text-[9px] font-black text-emerald-500 uppercase tracking-widest leading-none">Goal Reached</div>
+    </div>
+  </main>
+
+  <section class="flex flex-col items-center relative w-full px-6">
+    
+    <!-- Target Setting Pop-up -->
+    <div id="target-popup" class="target-popup">
+      <span class="label-tiny text-center">Set Target Number</span>
+      <input type="number" id="target-input" class="target-input" placeholder="Off" min="1">
+      <p id="error-msg" class="text-[9px] text-red-500 font-bold mt-2 text-center opacity-0 transition-opacity">Enter a positive number</p>
+      <button onclick="applyTarget()" class="w-full mt-3 py-3 text-[10px] font-black uppercase tracking-widest bg-neutral-900 text-white rounded-xl active:scale-95 transition-transform">SET COUNTER</button>
+    </div>
+
+    <!-- Target Toggle Button -->
+    <button onclick="toggleTargetPopup()" class="mb-4 text-[10px] font-bold text-neutral-400 hover:text-neutral-900 transition-colors uppercase tracking-widest flex items-center gap-2">
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+      Set Target
+    </button>
+
+    <!-- Button Row: [-] Reset [+] -->
+    <div class="btn-row">
+      <button onclick="decrement()" class="btn-action btn-small" title="Subtract">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      </button>
+
+      <button onclick="resetCounter()" class="btn-action btn-reset">Reset</button>
+
+      <button onclick="increment()" class="btn-action btn-small !bg-neutral-900 !text-white" title="Add">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      </button>
+    </div>
+
+    <footer class="mt-12">
+      <p class="text-[10px] font-medium text-neutral-400 tracking-wider leading-relaxed">
+        Made with ❤️...... But mostly 🧠<br>
+        <a href="https://www.PrithviSharma.com" target="_blank" class="inline-block mt-1 font-bold text-neutral-500 hover:text-neutral-900 transition-colors">www.PrithviSharma.com</a>
+      </p>
+    </footer>
+  </section>
+
+  <script>
+    let count = 0;
+    let target = 0;
+    let celebrated = false;
+
+    const display = document.getElementById('counter-display');
+    const targetInput = document.getElementById('target-input');
+    const targetPopup = document.getElementById('target-popup');
+    const targetInfo = document.getElementById('target-info');
+    const targetValueDisplay = document.getElementById('target-value-display');
+    const goalTag = document.getElementById('goal-tag');
+    const errorMsg = document.getElementById('error-msg');
+
+    function updateUI() {
+      display.textContent = count;
+      
+      if (target > 0) {
+        targetInfo.classList.remove('opacity-0');
+        targetValueDisplay.textContent = target;
+        
+        if (count >= target) {
+          display.classList.add('target-reached');
+          goalTag.classList.remove('invisible');
+          goalTag.classList.add('opacity-100');
+          
+          if (!celebrated) {
+            triggerCelebration();
+            celebrated = true;
+          }
+        } else {
+          display.classList.remove('target-reached');
+          goalTag.classList.add('invisible');
+          goalTag.classList.remove('opacity-100');
+          celebrated = false;
+        }
+      } else {
+        targetInfo.classList.add('opacity-0');
+        display.classList.remove('target-reached');
+      }
+
+      // Pop Animation
+      display.style.transform = 'scale(1.08)';
+      setTimeout(() => {
+        display.style.transform = 'scale(1)';
+      }, 150);
+    }
+
+    function increment() {
+      count++;
+      updateUI();
+    }
+
+    function decrement() {
+      if (count > 0) {
+        count--;
+        updateUI();
+      }
+    }
+
+    function resetCounter() {
+      count = 0;
+      celebrated = false;
+      updateUI();
+    }
+
+    function toggleTargetPopup() {
+      targetPopup.classList.toggle('active');
+      if (targetPopup.classList.contains('active')) {
+        targetInput.focus();
+        // Set input value to current target if active
+        if (target > 0) targetInput.value = target;
+      }
+    }
+
+    function applyTarget() {
+      const rawValue = targetInput.value;
+      const val = parseInt(rawValue);
+
+      // Validation
+      if (rawValue === "") {
+        target = 0;
+        targetInput.classList.remove('error');
+        errorMsg.classList.add('opacity-0');
+        celebrated = false;
+        updateUI();
+        toggleTargetPopup();
+      } else if (isNaN(val) || val <= 0) {
+        targetInput.classList.add('error');
+        errorMsg.classList.remove('opacity-0');
+        // Do not update target if invalid
+      } else {
+        targetInput.classList.remove('error');
+        errorMsg.classList.add('opacity-0');
+        target = val;
+        celebrated = false;
+        updateUI();
+        toggleTargetPopup();
+      }
+    }
+
+    function triggerCelebration() {
+      confetti({
+        particleCount: 150,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#10b981', '#171717', '#d4d4d4']
+      });
+    }
+
+    // Live validation feedback (doesn't apply until SET COUNTER)
+    targetInput.addEventListener('input', (e) => {
+      const val = parseInt(e.target.value);
+      if (e.target.value !== "" && (isNaN(val) || val <= 0)) {
+        targetInput.classList.add('error');
+        errorMsg.classList.remove('opacity-0');
+      } else {
+        targetInput.classList.remove('error');
+        errorMsg.classList.add('opacity-0');
+      }
+    });
+
+    // Close popup on click outside
+    document.addEventListener('click', (e) => {
+      if (!targetPopup.contains(e.target) && 
+          !e.target.closest('button')?.onclick?.toString().includes('toggleTargetPopup') &&
+          targetPopup.classList.contains('active')) {
+        targetPopup.classList.remove('active');
+      }
+    });
+
+    // Keyboard Shortcuts
+    document.addEventListener('keydown', (e) => {
+      if (document.activeElement === targetInput) {
+        if (e.key === 'Enter') applyTarget();
+        if (e.key === 'Escape') toggleTargetPopup();
+        return;
+      }
+      
+      if (e.code === 'Space' || e.key === '+' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        increment();
+      } else if (e.key === '-' || e.key === 'ArrowDown') {
+        e.preventDefault();
+        decrement();
+      } else if (e.key === 'r' || e.key === 'R') {
+        resetCounter();
+      }
+    });
+  </script>
+<script type="module" src="/index.tsx"></script>
+</body>
+</html>
