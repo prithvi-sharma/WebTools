@@ -7,7 +7,7 @@ Minimal WebTools made for Simple Usage of which you wont need to install any app
 
 ## Available Tools
 
-1. <strong>Coin Toss</strong> : Simple Coin Flip Tool [🟢](https://example.com/your-project)
+1. <strong>Coin Toss</strong> : Simple Coin Flip Tool [🟢](https://webtools.prithvisharma.com/coin_toss.html)
 
 Let me know what you think — if you have any ideas for features, always keen : mail@prithvisharma.com
 
