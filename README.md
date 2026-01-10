@@ -3,12 +3,12 @@
 
 Minimal WebTools made for Simple Usage of which you wont need to install any apps.
 
-<strong>Website</strong> = WebTools.PrithviSharma.com (🟢 Live!)
+<strong>Website</strong> = WebTools.PrithviSharma.com [Live - 🟢](https://webtools.prithvisharma.Com)
 
 ## Available Tools
 
-1. <strong>Coin Toss</strong> : Simple Coin Flip Tool [Stable - 🟢](https://webtools.prithvisharma.com/coin_toss.html)
-2. <strong>Counter</strong> : Count your Clicks [Beta - 🔴](https://webtools.prithvisharma.com/test.html)
+1. <strong>Coin Toss</strong> : Simple Coin Flip Tool : [Stable - 🟢](https://webtools.prithvisharma.com/coin_toss.html)
+2. <strong>Counter</strong> : Count your Clicks : [Beta - 🔴](https://webtools.prithvisharma.com/test.html)
 
 Let me know what you think — if you have any ideas for features, always keen : mail@prithvisharma.com
 
