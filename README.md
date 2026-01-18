@@ -8,7 +8,7 @@ Minimal WebTools made for Simple Usage of which you wont need to install any app
 ## Available Tools
 
 1. <strong>Coin Toss</strong> : Simple Coin Flip Tool : [Stable - 🟢](https://webtools.prithvisharma.com/coin_toss.html)
-2. <strong>Counter</strong> : Count your Clicks : [Stable - 🟢](https://webtools.prithvisharma.com/test.html)
+2. <strong>Counter</strong> : Count your Clicks : [Stable - 🟢](https://webtools.prithvisharma.com/counter.html)
 
 Let me know what you think — if you have any ideas for features, always keen : mail@prithvisharma.com
 
