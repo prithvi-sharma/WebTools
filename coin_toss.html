@@ -105,8 +105,13 @@
           </div>
         </div>
 
-        <div class="h-[5.5rem] flex items-center justify-center mt-6 w-full">
-		  <div id="result" class="w-full text-center pointer-events-none"></div>
+		<!-- Result Slot -->
+		<div class="h-[5.5rem] mt-6 flex items-center justify-center">
+		  <div
+			id="result"
+			class="font-bold text-5xl text-gray-700/40 uppercase animate-fade-in
+				   grid grid-flow-col auto-cols-[1ch] gap-[0.25em] place-items-center"
+		  ></div>
 		</div>
 
       </div>
@@ -155,44 +160,48 @@
     return result;
   }
 
-  document.getElementById('main').addEventListener('click', () => {
-    if (isFlipping) return;
-    isFlipping = true;
+	document.getElementById('main').addEventListener('click', () => {
+	  if (isFlipping) return;
+	  isFlipping = true;
 
-    resultEl.innerHTML = '';
+	  resultEl.innerHTML = '';
 
-    coinWrap.classList.remove('jump');
-    shadow.classList.remove('shadow-anim');
-    void coinWrap.offsetWidth;
-    coinWrap.classList.add('jump');
-    shadow.classList.add('shadow-anim');
+	  coinWrap.classList.remove('jump');
+	  shadow.classList.remove('shadow-anim');
+	  void coinWrap.offsetWidth;
+	  coinWrap.classList.add('jump');
+	  shadow.classList.add('shadow-anim');
 
-    // single source of truth
-    const flipResult = probabilisticFlip();
+	  // single source of truth
+	  const flipResult = probabilisticFlip();
 
-    const spins = 12 + Math.floor(Math.random() * 4);
-    const base = spins * 360;
-    const direction = Math.random() > 0.5 ? 1 : -1;
+	  const spins = 12 + Math.floor(Math.random() * 4);
+	  const base = spins * 360;
+	  const direction = Math.random() > 0.5 ? 1 : -1;
 
-    // exact final face
-    const targetFace = flipResult === 'HEADS' ? 0 : 180;
+	  const targetFace = flipResult === 'HEADS' ? 0 : 180;
 
-    // normalize current rotation
-    const normalized = ((rotation % 360) + 360) % 360;
-    rotation += direction * (base + (targetFace - normalized));
+	  const normalized = ((rotation % 360) + 360) % 360;
+	  rotation += direction * (base + (targetFace - normalized));
 
-    coin.style.transform = `rotateY(${rotation}deg)`;
+	  coin.style.transform = `rotateY(${rotation}deg)`;
 
-    setTimeout(() => {
-      isFlipping = false;
+	  setTimeout(() => {
+		isFlipping = false;
 
-      resultEl.innerHTML = `
-        <h2 class="text-5xl font-bold text-gray-700/40 tracking-[0.25em] animate-fade-in text-center">
-          ${flipResult}
-        </h2>
-      `;
-    }, 2500);
-  });
+		resultEl.innerHTML = `
+		  <div class="grid grid-flow-col auto-cols-[1ch] gap-[0.25em] place-items-center animate-fade-in">
+			${flipResult
+			  .split('')
+			  .map(
+				(char) =>
+				  `<span class="inline-block w-[1ch] text-center text-5xl font-bold text-gray-700/40 uppercase">${char}</span>`
+			  )
+			  .join('')}
+		  </div>
+		`;
+	  }, 2500);
+	});
 </script>
 </body>
 </html>
