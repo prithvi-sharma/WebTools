@@ -6,110 +6,193 @@
   <title>Coin Toss</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
+
   <style>
-    body{font-family:'Inter',system-ui,Segoe UI,Roboto,sans-serif;margin:0;background:#fbfbfb}
-    .perspective{perspective:1200px}
-    .preserve-3d{transform-style:preserve-3d}
-    .backface-hidden{backface-visibility:hidden}
-    .rotate-y-180{transform:rotateY(180deg)}
-    .cubic-bezier{transition-timing-function:cubic-bezier(0.15,0,0.15,1)}
-    .animate-fade-in{animation:fade .5s ease-out forwards}
-    @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #fbfbfb;
+    }
 
-    @keyframes coin-jump {0%{transform:translateY(0)}35%{transform:translateY(-34px)}70%{transform:translateY(0)}100%{transform:translateY(0)}}
-    .jump{animation:coin-jump 900ms cubic-bezier(0.15,0,0.15,1) forwards}
+    .perspective { perspective: 1200px }
+    .preserve-3d { transform-style: preserve-3d }
+    .backface-hidden { backface-visibility: hidden }
+    .rotate-y-180 { transform: rotateY(180deg) }
 
-    @keyframes shadow-pulse {0%{transform:scale(1);opacity:.7}35%{transform:scale(.8);opacity:.4}70%{transform:scale(1);opacity:.7}100%{transform:scale(1);opacity:.7}}
-    .shadow-anim{animation:shadow-pulse 900ms cubic-bezier(0.15,0,0.15,1) forwards}
+    .cubic-bezier {
+      transition-timing-function: cubic-bezier(0.15,0,0.15,1);
+    }
 
-    .title-gap { margin-bottom: 4px; }
-    .result-offset { transform: translate(-50%, 24px); }
-	
-	#coinWrap {
-	  display: flex;
-	  align-items: center; 
-	  justify-content: center;
+    @keyframes fade {
+      from { opacity: 0; transform: translateY(6px) }
+      to { opacity: 1; transform: translateY(0) }
+    }
+    .animate-fade-in {
+      animation: fade .5s ease-out forwards;
+    }
 
-	#result {
-	  width: 100%;        
-	  text-align: center;
-	  position: absolute;
-	  left: 50%;
-	  top: 100%;
-	  transform: translateX(-50%);
-	}
+    @keyframes coin-jump {
+      0% { transform: translateY(0) }
+      35% { transform: translateY(-34px) }
+      70% { transform: translateY(0) }
+      100% { transform: translateY(0) }
+    }
+    .jump {
+      animation: coin-jump 900ms cubic-bezier(0.15,0,0.15,1) forwards;
+    }
+
+    @keyframes shadow-pulse {
+      0% { transform: scale(1); opacity: .7 }
+      35% { transform: scale(.8); opacity: .4 }
+      70% { transform: scale(1); opacity: .7 }
+      100% { transform: scale(1); opacity: .7 }
+    }
+    .shadow-anim {
+      animation: shadow-pulse 900ms cubic-bezier(0.15,0,0.15,1) forwards;
+    }
   </style>
 </head>
+
 <body>
-  <div id="app" class="min-h-screen flex flex-col items-center justify-start pt-8 pb-6 px-4 md:px-6 select-none bg-[#FBFBFB]">
-    <header class="w-full text-center">
-      <h1 class="text-3xl tracking-[0.2em] text-gray-400 font-black title-gap">Coin Toss</h1>
+  <div class="min-h-screen flex flex-col items-center px-4 py-6">
+
+    <header class="text-center mb-6">
+      <h1 class="text-3xl tracking-[0.25em] text-gray-400 font-black">
+        Coin Toss
+      </h1>
     </header>
 
-    <main id="main" class="w-full flex items-center justify-center mt-2">
-      <div class="flex flex-col items-center">
-        <div id="shadow" class="w-[85vw] h-10 rounded-full bg-black/15 blur-2xl" style="opacity:.7; transition:opacity .2s, transform .2s;"></div>
+    <main
+      id="main"
+      class="flex flex-col items-center justify-start flex-grow w-full pt-12 cursor-pointer"
+    >
+      <div class="relative flex flex-col items-center justify-center">
 
-        <div id="coinWrap" class="relative mt-10 w-[75vw] h-[75vw] aspect-square" aria-label="Coin Wrapper" role="button">
-          <div id="coin" class="perspective w-full h-full preserve-3d cubic-bezier" style="transition:transform 2.5s cubic-bezier(.15,0,.15,1);">
-            <div class="absolute inset-0 w-full h-full rounded-full border border-gray-200/50 flex items-center justify-center backface-hidden shadow-sm"
-                 style="background:linear-gradient(135deg,#fff8e0,#ededed);">
-              <span class="text-gray-500/40 font-semibold text-[2rem] md:text-3xl tracking-[0.2em] mt-2">Heads</span>
+        <div
+          id="shadow"
+          class="h-10 rounded-full bg-black/15 blur-2xl mb-4"
+          style="width: clamp(280px, 82vw, 440px);">
+        </div>
+
+        <div
+          id="coinWrap"
+          class="relative flex items-center justify-center"
+          style="width: clamp(280px, 82vw, 440px); aspect-ratio: 1 / 1;"
+          role="button"
+          aria-label="Flip Coin"
+        >
+          <div
+            id="coin"
+            class="w-full h-full perspective preserve-3d cubic-bezier"
+            style="transition: transform 2.5s cubic-bezier(.15,0,.15,1);"
+          >
+            <div
+              class="absolute inset-0 rounded-full border border-gray-200/50 flex items-center justify-center backface-hidden shadow-sm"
+              style="background: linear-gradient(135deg,#fff8e0,#ededed);"
+            >
+              <span class="text-gray-500/40 font-semibold text-3xl tracking-[0.2em]">
+                Heads
+              </span>
             </div>
-            <div class="absolute inset-0 w-full h-full rounded-full border border-gray-200/50 flex items-center justify-center backface-hidden rotate-y-180 shadow-sm"
-                 style="background:linear-gradient(135deg,#fff8e0,#ededed);">
-              <span class="text-gray-500/40 font-semibold text-[2rem] md:text-3xl tracking-[0.2em] mt-2">Tails</span>
+
+            <div
+              class="absolute inset-0 rounded-full border border-gray-200/50 flex items-center justify-center backface-hidden rotate-y-180 shadow-sm"
+              style="background: linear-gradient(135deg,#fff8e0,#ededed);"
+            >
+              <span class="text-gray-500/40 font-semibold text-3xl tracking-[0.2em]">
+                Tails
+              </span>
             </div>
           </div>
-
-		<div id="result"
-			 class="absolute left-1/2 top-full pointer-events-none text-center"
-			 style="transform: translateX(-50%);"
-			 aria-hidden="true"></div>
-
         </div>
+
+        <div class="h-[5.5rem] flex items-center justify-center mt-6 w-full">
+		  <div id="result" class="w-full text-center pointer-events-none"></div>
+		</div>
+
       </div>
     </main>
 
-	<footer class="w-full text-center py-6 flex flex-col gap-1 mt-auto">
-	  <p class="text-xs md:text-sm text-zinc-400">Made with ❤️...... But mostly 🧠</p>
-	  <a href="#" class="text-xs md:text-sm text-zinc-500 hover:text-zinc-900 hover:underline">www.PrithviSharma.com</a>
-	</footer>
+    <footer class="text-center text-xs text-zinc-400 mt-8">
+      <p>Made with ❤️...... But mostly 🧠</p>
+      <a href="#" class="text-zinc-500 hover:text-zinc-900 hover:underline">
+        www.PrithviSharma.com
+      </a>
+    </footer>
   </div>
 
-  <script>
-    const coin = document.getElementById('coin');
-    const coinWrap = document.getElementById('coinWrap');
-    const shadow = document.getElementById('shadow');
-    const resultEl = document.getElementById('result');
-    let isFlipping = false;
-    let rotation = 0;
+<script>
+  const coin = document.getElementById('coin');
+  const coinWrap = document.getElementById('coinWrap');
+  const shadow = document.getElementById('shadow');
+  const resultEl = document.getElementById('result');
 
-    document.getElementById('main').addEventListener('click', () => {
-      if (isFlipping) return;
-      isFlipping = true;
-      resultEl.innerHTML = '';
+  let isFlipping = false;
 
-      coinWrap.classList.remove('jump');
-      shadow.classList.remove('shadow-anim');
-      void coinWrap.offsetWidth;
-      coinWrap.classList.add('jump');
-      shadow.classList.add('shadow-anim');
+  // probabilistic state
+  let totalFlips = 0;
+  let headsCount = 0;
+  let tailsCount = 0;
 
-      const flipResult = Math.random() > 0.5 ? 'HEADS' : 'TAILS';
-      const spins = 12 + Math.floor(Math.random() * 4);
-      const base = spins * 360;
-      const adjust = flipResult === 'HEADS' ? 0 : 180;
-      const norm = ((rotation % 360) + 360) % 360;
-      rotation = rotation + (360 - norm) + base + adjust;
+  // initial random face
+  let rotation = Math.random() > 0.5 ? 0 : 180;
+  coin.style.transform = `rotateY(${rotation}deg)`;
 
-      coin.style.transform = 'rotateY(' + rotation + 'deg)';
+  function probabilisticFlip() {
+    totalFlips++;
 
-      setTimeout(() => {
-        isFlipping = false;
-        resultEl.innerHTML = '<h2 class="text-[4rem] md:text-6xl font-bold text-gray-700/40 uppercase tracking-[0.25em] animate-fade-in">' + flipResult + '</h2>';
-      }, 2500);
-    });
-  </script>
+    const expectedHeads = totalFlips / 2;
+    const bias = headsCount - expectedHeads;
+
+    // soft correction (prevents long streaks but keeps randomness)
+    const correction = Math.max(-0.12, Math.min(0.12, -bias / totalFlips));
+    const probabilityHeads = 0.5 + correction;
+
+    const result = Math.random() < probabilityHeads ? 'HEADS' : 'TAILS';
+
+    if (result === 'HEADS') headsCount++;
+    else tailsCount++;
+
+    return result;
+  }
+
+  document.getElementById('main').addEventListener('click', () => {
+    if (isFlipping) return;
+    isFlipping = true;
+
+    resultEl.innerHTML = '';
+
+    coinWrap.classList.remove('jump');
+    shadow.classList.remove('shadow-anim');
+    void coinWrap.offsetWidth;
+    coinWrap.classList.add('jump');
+    shadow.classList.add('shadow-anim');
+
+    // single source of truth
+    const flipResult = probabilisticFlip();
+
+    const spins = 12 + Math.floor(Math.random() * 4);
+    const base = spins * 360;
+    const direction = Math.random() > 0.5 ? 1 : -1;
+
+    // exact final face
+    const targetFace = flipResult === 'HEADS' ? 0 : 180;
+
+    // normalize current rotation
+    const normalized = ((rotation % 360) + 360) % 360;
+    rotation += direction * (base + (targetFace - normalized));
+
+    coin.style.transform = `rotateY(${rotation}deg)`;
+
+    setTimeout(() => {
+      isFlipping = false;
+
+      resultEl.innerHTML = `
+        <h2 class="text-5xl font-bold text-gray-700/40 tracking-[0.25em] animate-fade-in text-center">
+          ${flipResult}
+        </h2>
+      `;
+    }, 2500);
+  });
+</script>
 </body>
 </html>
